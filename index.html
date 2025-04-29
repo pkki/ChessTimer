@@ -200,7 +200,7 @@
         }
         function playAudio(filename) {
             const so = document.getElementById("yomiaudio");
-            so.src = saudio + filename + ".mp3?" + Date.now();
+            so.src = saudio + filename + ".mp3";
             so.load();
             so.play();
         }
@@ -261,7 +261,7 @@
             }else{
                 mode = 1
                 tput1_change()
-                //tput2_change()
+                tput2_change()
                 let units = document.querySelectorAll('.unit');
                 units.forEach(function(unit) {
                         unit.textContent = "秒";
@@ -397,6 +397,9 @@
             }
         }
         function tput2_change(){
+            if(ab == 0){
+                return
+            }
             if(mode == 0){
                 timer3 = parseInt(document.getElementById("2tput").value)*60
             }else{
