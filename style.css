@@ -327,7 +327,7 @@ body{
 }
 @media screen and (max-height: 550px) {
 	#touch{
-        height: 60vh;
+        height: 50vh;
     }
     #info{
         height: 20vh;
@@ -344,5 +344,11 @@ body{
     }
     #setting span{
         font-size: 15vh;
+    }
+    #timer-d{
+        height: 25vh;
+    }
+    #timer-d p{
+        font-size: 20vh;
     }
 }
