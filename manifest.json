@@ -1,0 +1,16 @@
+{
+    "name": "対局時計webサイト",
+    "short_name": "対局時計",
+    "theme_color": "#CDEBFF",
+    "background_color": "#CDEBFF",
+    "display": "standalone",
+    "start_url": "./index.html",
+    "icons": [
+      {
+        "src": "./192.png",
+        "sizes": "192x192",
+        "type": "image/png"
+      }
+    ]
+  }
+  

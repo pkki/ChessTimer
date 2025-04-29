@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>対局時計web</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="manifest" href="./manifest.json">
+</head>
+
+<body>
+    <audio id="caudio">
+        <source src="voice/click1.mp3" type="audio/mp3">
+    </audio>
+    <audio id="cocaaudio">
+        <source src="voice/coca.mp3" type="audio/mp3">
+    </audio>
+    <audio id="yomiaudio">
+        <source src="voice/coca.mp3" type="audio/mp3" id="yomiaudioc">
+    </audio>
+    <div id="timeout-b">
+    </div>
+    <div id="timeout">
+        <p id="timeout_message">後手時間切れ</p>
+        <button onclick="closem()">閉じる</button>
+    </div>
+    <div id="setting_detail">
+        <div class="setting_input">
+            <p>ボイス:</p>
+            <select name="" id="voice_select" onchange="change_voice()">
+                <option value="voice/men1/">男性1</option>
+                <option value="voice/woman1/">女性1</option>
+                <option value="voice/men1_America/">America_men1</option>
+                <option value="voice/zunda/">ずんだもん</option>
+            </select>
+        </div>
+        <p> VOICEVOX:ずんだもん</p>
+        <div class="setting_input">
+            <p>ミュート:</p>
+            <input type="checkbox" name="" id="mutec" onchange="mutee()">
+        </div>
+        <p>© 2025 pkki</p>
+        <p>バージョン1.0</p>
+        <p>※保存にはcookieを使用します。</p>
+        <button onclick="save()">保存</button>
+        <button onclick="close_setting()">閉じる</button>
+    </div>
+    <div id="touch">
+        <div id="touch1">
+            <p>先手</p>
+        </div>
+        <div id="touch2">
+            <p>後手</p>
+        </div>
+    </div>
+    <div id="progress-bar">
+        <div id="bar1"></div>
+        <div id="bar2"></div>
+    </div>
+    <div id="timer-d">
+        <div id="timer1"><p id="timer1p">10:00</p></div>
+        <div id="tesuu"><p id="tesuu1">0</p></div>
+        <div id="timer3"><p id="timer3p">10:00</p></div>
+    </div>
+    <div id="info">
+        <div id="adjust_t1">
+            <div class="clip-path-shadow">
+                <div class="minus" id="1_minus"></div>
+            </div>
+            <input type="number" name="" id="1tput" class="timersetp" value="10" oninput="tput1_change()" min="1" onblur="check1t()">
+            <p class="unit">分</p>
+            <div class="clip-path-shadow">
+                <div class="plus" id="1_plus"></div>
+            </div>
+        </div>
+        <div id="setting">
+            <span class="material-symbols-outlined" style="display:none;" id="start">
+                play_arrow
+            </span>
+            <span class="material-symbols-outlined" id="stop">
+                stop_circle
+                </span>
+            <div>
+                <div>
+                    <p>持ち時間設定</p>
+                    <select name="" id="havetimesetting" onchange="havetimesetting_c()">
+                        <option value="1">秒読み</option>
+                        <option value="0" selected>切れ負け</option>
+                    </select>
+                </div>
+                <div>
+                    <input type="checkbox" name="" id="checkbox1" checked>
+                    <p>先後で設定する</p>
+                </div>
+                <div>
+                    <button onclick="setting_detail()">詳細設定</button>
+                </div>
+            </div>
+            <span class="material-symbols-outlined" id="refresh">
+                refresh
+                </span>
+        </div>
+        <div id="adjust_t2"> 
+            <div class="clip-path-shadow">
+                <div class="minus" id="2_minus"></div>
+            </div>
+            <input type="number" name="" id="2tput" class="timersetp" value="10" oninput="tput2_change()"min="1" onblur="check2t()">
+            <p class="unit">分</p>
+            <div class="clip-path-shadow">
+                <div class="plus" id="2_plus"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        let tesuu = 0
+        let mute = false
+        let saudio = "voice/men1/"
+        let ab = 1
+        let initial1 = 0
+        let initial3 = 0
+        let timer1 = 600
+        let timer3 = 600
+        let mode = 0
+        // 0は先手
+        let condition = false
+        let now = 0
+        let timer_p2;
+        let s_p2 = 0
+        let stopcondition = false
+        function mutee(){
+            if(document.getElementById("mutec").checked){
+                mute = true
+            }else{
+                mute = false
+            }
+        }
+        window.onload = function(){
+            // ページ読み込み時に実行したい処理
+            if(!Cookies.get("save")==undefined){
+                
+            }else{
+                if(Cookies.get("ab") == 0){
+                    document.getElementById("checkbox1").checked = false
+                    setting_ab()
+                }
+                timer1 = Cookies.get("timer1");
+                timer3 = Cookies.get("timer3");
+                mode = Cookies.get("mode")
+                if(mode !== 0){
+                    document.getElementById("havetimesetting").value = mode
+                    if(mode == 1){
+                        let units = document.querySelectorAll('.unit');
+                        units.forEach(function(unit) {
+                                unit.textContent = "秒";
+                        });
+                    }
+                }
+                timer1p_up();
+                timer3p_up();
+                if(mode==0){
+                    document.getElementById("1tput").value = timer1/60
+                    document.getElementById("2tput").value = timer3/60
+                }else{
+                    document.getElementById("1tput").value = timer1
+                    document.getElementById("2tput").value = timer3
+                }
+                saudio = Cookies.get("saudio");
+                document.getElementById("voice_select").value = saudio
+                
+                if(Cookies.get("mute") =="true"){
+                    document.getElementById("mutec").checked = true
+                    mute = true;
+                }
+            }
+        }
+        function save(){
+            Cookies.set("timer1",timer1);
+            Cookies.set("timer3",timer3);
+            Cookies.set("mode",mode);
+            Cookies.set("saudio",saudio);
+            Cookies.set("ab",ab);
+            Cookies.set("save","true");
+            Cookies.set("mute",mute);
+            alert("保存しました")
+        }
+        function change_voice(){
+            saudio = document.getElementById("voice_select").value
+        }
+        function close_setting(){
+            document.getElementById("timeout-b").style.display = "none"
+            document.getElementById("setting_detail").style.display = "none"
+        }
+        function setting_detail(){
+                document.getElementById("timeout-b").style.display = "block"
+                document.getElementById("setting_detail").style.display = "block"
+        }
+        function playAudio(filename) {
+            const so = document.getElementById("yomiaudio");
+            so.src = saudio + filename + ".mp3?" + Date.now();
+            so.load();
+            so.play();
+        }
+
+    function yomi(a) {
+        if(mute){
+            return
+        }
+        if (a === "gover") {
+            playAudio("gover");
+        } else if (a === "sover") {
+            playAudio("sover");
+        } else if (a === "start") {
+            playAudio("w");
+        } else {
+            if (mode === 0) {
+                if (a === 600) playAudio("10m");
+                else if (a === 300) playAudio("5m");
+                else if (a === 180) playAudio("3m");
+                else if (a === 60) playAudio("1m");
+                else if (a === 30) playAudio("30s");
+                else if (a === 20) playAudio("20s");
+                else if (a === 10) playAudio("10s");
+            } else {
+                if (a === 600) playAudio("10m");
+                else if (a === 300) playAudio("5m");
+                else if (a === 180) playAudio("3m");
+                else if (a === 60) playAudio("1m");
+                else if (a === 50) playAudio("50s");
+                else if (a === 40) playAudio("40s");
+                else if (a === 30) playAudio("30s");
+                else if (a === 20) playAudio("20s");
+                else if (a === 10) playAudio("10s");
+                else if (a === 9) playAudio("1s");
+                else if (a === 8) playAudio("2s");
+                else if (a === 7) playAudio("3s");
+                else if (a === 6) playAudio("4s");
+                else if (a === 5) playAudio("5s");
+                else if (a === 4) playAudio("6s");
+                else if (a === 3) playAudio("7s");
+                else if (a === 2) playAudio("8s");
+                else if (a === 1) playAudio("9s");
+            }
+        }
+    }
+
+        function havetimesetting_c(){
+            let f = document.getElementById("havetimesetting").value
+            if(f == 0){
+                mode = 0
+                tput1_change()
+                tput2_change()
+                let units = document.querySelectorAll('.unit');
+                units.forEach(function(unit) {
+                        unit.textContent = "分";
+                });
+
+            }else{
+                mode = 1
+                tput1_change()
+                //tput2_change()
+                let units = document.querySelectorAll('.unit');
+                units.forEach(function(unit) {
+                        unit.textContent = "秒";
+                });
+            }
+        }
+        function minus_1() {
+            if(condition){
+                return
+            }
+            if(document.getElementById("1tput").value > 1){
+                document.getElementById("1tput").value=parseInt(document.getElementById("1tput").value)-1
+                if(mode==0){
+                    timer1 = parseInt(document.getElementById("1tput").value)*60
+                }else{
+                    timer1 = parseInt(document.getElementById("1tput").value)
+                }
+            }
+            timer1pc()
+            timer1p_up()
+            audio("caudio")
+        }
+        function plus_1() {
+            if(condition){
+                return
+            }
+            document.getElementById("1tput").value=parseInt(document.getElementById("1tput").value)+1
+            if(mode==0){
+                    timer1 = parseInt(document.getElementById("1tput").value)*60
+            }else{
+                    timer1 = parseInt(document.getElementById("1tput").value)
+            }
+            timer1pc()
+            timer1p_up()
+            audio("caudio")
+        }
+        function minus_2() {
+            if(condition){
+                return
+            }
+            if(document.getElementById("2tput").value > 1){
+                document.getElementById("2tput").value=parseInt(document.getElementById("2tput").value)-1
+            }
+            if(mode==0){
+                timer3 = parseInt(document.getElementById("2tput").value)*60
+            }else{
+                timer3 = parseInt(document.getElementById("2tput").value)
+            }
+            timer3p_up()
+            audio("caudio")
+        }
+        function plus_2() {
+            if(condition){
+                return
+            }
+            document.getElementById("2tput").value=parseInt(document.getElementById("2tput").value)+1
+            if(mode==0){
+                timer3 = parseInt(document.getElementById("2tput").value)*60
+            }else{
+                timer3 = parseInt(document.getElementById("2tput").value)
+            }
+            timer3p_up()
+            audio("caudio")
+        }
+        function setting_ab(){
+            if(condition){
+                return
+            }
+            if(document.getElementById("checkbox1").checked){
+                document.getElementById("adjust_t1").style.display="flex";
+                document.getElementById("adjust_t2").style.display="flex";
+                ab = 1
+                if(mode==0){
+                    document.getElementById("2tput").value = timer3/60
+                }else{
+                    document.getElementById("2tput").value = timer3
+                }
+            }else{
+                document.getElementById("adjust_t1").style.display="flex";
+                document.getElementById("adjust_t2").style.display="none";
+                ab = 0
+            }
+        }
+        function transs(a) {
+            // 時間、分、秒の計算をする関数
+            function padZero(num) {
+                return num < 10 ? '0' + num : num;
+            }
+
+            if (a >= 3600) {  // 1時間以上の場合
+                let hours = Math.floor(a / 3600);
+                let minutes = Math.floor((a - (hours * 3600)) / 60);
+                let seconds = a - (hours * 3600) - (minutes * 60);
+                return padZero(hours) + ":" + padZero(minutes) + ":" + padZero(seconds);
+            } else if (a >= 60) {  // 1時間未満、60分以上の場合
+                let minutes = Math.floor(a / 60);
+                let seconds = a - (minutes * 60);
+                return padZero(minutes) + ":" + padZero(seconds);
+            } else {  // 60分未満の場合
+                return padZero(0) + ":" + padZero(a);
+            }
+        }
+        function timer1p_up(){
+            document.getElementById("timer1p").innerText = transs(timer1)
+        }
+        function timer3p_up(){
+            document.getElementById("timer3p").innerText = transs(timer3)
+        }
+        function timer1pc(){
+            if(ab != 1){
+                if(mode==0){
+                    timer3 = parseInt(document.getElementById("1tput").value)*60
+                }else{
+                    timer3 = parseInt(document.getElementById("1tput").value)
+                }
+                timer3p_up()
+            }
+        }
+        function tput1_change(){
+            if(mode == 0){
+                timer1 = parseInt(document.getElementById("1tput").value)*60
+            }else{
+                timer1 = parseInt(document.getElementById("1tput").value)
+            }
+            timer1p_up()
+            if(ab == 0){
+                if(mode == 0){
+                    timer3 = parseInt(document.getElementById("1tput").value)*60
+                }else{
+                    timer3 = parseInt(document.getElementById("1tput").value)
+                }
+                timer3p_up()
+            }
+        }
+        function tput2_change(){
+            if(mode == 0){
+                timer3 = parseInt(document.getElementById("2tput").value)*60
+            }else{
+                timer3 = parseInt(document.getElementById("2tput").value)
+            }
+            timer3p_up()
+        }
+        function check1t(){
+            if(document.getElementById("1tput").value === "" || parseInt(document.getElementById("1tput").value) == 0){
+                document.getElementById("1tput").value = 1
+                tput1_change()
+            }
+        }
+        function check2t(){
+            if(document.getElementById("1tput").value === ""|| parseInt(document.getElementById("2tput").value) == 0){
+                document.getElementById("2tput").value = 1
+                tput2_change()
+            }
+        }
+        let lastTime = Date.now(); // ミリ秒単位で記録
+        function audio(a){
+            if(mute){
+            return
+        }
+            document.getElementById(a).currentTime = 0; 
+            document.getElementById(a).play(); 
+        }
+        // ChatGPTを使って少し改善してもらった(前まではData.nowを使って誤差は抑えたが、ChatGPTによってlastTime変数によって更に誤差が縮められた)
+        function mtimer1() {
+            let nowTime = Date.now(); // 現在のミリ秒
+            let diff = Math.floor((nowTime - lastTime) / 1000); // 経過秒数
+
+            if (diff > 0) {
+                if (now == 1) {
+                    if (timer3 <= diff) {
+                        clearInterval(timer_p2);
+                        document.getElementById("timeout-b").style.display = "block";
+                        document.getElementById("timeout").style.display = "block";
+                        document.getElementById("timeout_message").innerText = tesuu+"手にて、後手時間切れです。";
+                        yomi("gover")
+                        timer3 = 0;
+                    } else {
+                        timer3 -= diff;
+                        timer3p_up();
+                        yomi(timer3)
+                    }
+                } else {
+                    if (timer1 <= diff) {
+                        clearInterval(timer_p2);
+                        document.getElementById("timeout-b").style.display = "block";
+                        document.getElementById("timeout").style.display = "block";
+                        document.getElementById("timeout_message").innerText =  tesuu+"手にて、先手時間切れです。";
+                        yomi("sover")
+                        timer1 = 0;
+                    } else {
+                        timer1 -= diff;
+                        yomi(timer1)
+                        timer1p_up();
+                    }
+                }
+                lastTime = nowTime; // 最後の時間を更新
+            }
+        }
+        function touch1_touch(){
+            if(stopcondition){
+                return
+            }
+            if(!condition){
+                condition = true
+                s_p2 = new Date();
+                now = 1
+                lastTime = Date.now();
+                timer_p2 = setInterval(mtimer1, 100);
+                document.getElementById("1tput").disabled = true;
+                document.getElementById("2tput").disabled = true;
+                document.getElementById("checkbox1").disabled = true;
+                document.getElementById("havetimesetting").disabled = true;
+                initial1 = timer1
+                initial3 = timer3
+                tesuu = 1
+                document.getElementById("tesuu1").innerText= tesuu
+            }else{
+                if(now == 1){
+                    return
+                }
+                tesuu +=1
+                document.getElementById("tesuu1").innerText= tesuu
+                clearInterval(timer_p2);
+                if(mode == 1){
+                    timer3 = initial3
+                }
+                s_p2 = new Date();
+                now = 1
+                timer_p2 = setInterval(mtimer1,100)
+            }
+            document.getElementById("bar1").style.backgroundColor = "white"
+            document.getElementById("bar2").style.backgroundColor = "greenyellow"
+            document.getElementById("touch1").style.backgroundColor = "rgb(155, 155, 155)"
+            document.getElementById("touch2").style.backgroundColor = "rgb(199, 199, 199)"
+            audio("caudio")
+        }
+        function touch2_touch(){
+            if(stopcondition){
+                return
+            }
+            if(condition){
+                if(now == 0){
+                    return
+                }
+                tesuu +=1
+                document.getElementById("tesuu1").innerText= tesuu
+                clearInterval(timer_p2);
+                if(mode == 1){
+                    timer1 = initial1
+                }
+                s_p2 = new Date();
+                now = 0
+                timer_p2 = setInterval(mtimer1,100)
+                document.getElementById("bar1").style.backgroundColor = "greenyellow"
+                document.getElementById("bar2").style.backgroundColor = "white"
+                document.getElementById("touch1").style.backgroundColor = "rgb(199, 199, 199)"
+                document.getElementById("touch2").style.backgroundColor = "rgb(155, 155, 155)"
+                audio("caudio")
+            }
+        }
+        function closem(){
+            document.getElementById("timeout-b").style.display = "none"
+            document.getElementById("timeout").style.display = "none"
+            timer1 = initial1
+            timer3 = initial3
+            timer1p_up()
+            timer3p_up()
+            condition = false
+            document.getElementById("1tput").disabled = false;
+            document.getElementById("2tput").disabled = false;
+            document.getElementById("checkbox1").disabled = false;
+            document.getElementById("havetimesetting").disabled = false;
+            document.getElementById("bar1").style.backgroundColor = "greenyellow"
+            document.getElementById("bar2").style.backgroundColor = "greenyellow"
+            document.getElementById("touch1").style.backgroundColor = "rgb(199, 199, 199)"
+            document.getElementById("touch2").style.backgroundColor = "rgb(199, 199, 199)"
+            tesuu =0
+            document.getElementById("tesuu1").innerText= tesuu
+        }
+        function refresh(){
+            if(!condition){
+                return
+            }
+            if(stopcondition){
+                stopcondition = false;
+                document.getElementById("stop").style.display ="block";
+                document.getElementById("start").style.display ="none";
+            }else{
+                clearInterval(timer_p2);
+            }
+            timer1 = initial1;
+            timer3 = initial3;
+            timer1p_up();
+            timer3p_up();
+            condition = false;
+            tesuu = 0;
+            document.getElementById("tesuu1").innerText= tesuu;
+            document.getElementById("1tput").disabled = false;
+            document.getElementById("2tput").disabled = false;
+            document.getElementById("havetimesetting").disabled = false;
+            document.getElementById("checkbox1").disabled = false;
+            document.getElementById("bar1").style.backgroundColor = "greenyellow"
+            document.getElementById("bar2").style.backgroundColor = "greenyellow"
+            document.getElementById("touch1").style.backgroundColor = "rgb(199, 199, 199)"
+            document.getElementById("touch2").style.backgroundColor = "rgb(199, 199, 199)"
+            audio("cocaaudio")
+        }
+        function start1(){
+            if(condition || stopcondition){
+                stopcondition = false;
+                s_p2 = new Date();
+                lastTime = Date.now();
+                timer_p2 = setInterval(mtimer1, 100);
+                document.getElementById("stop").style.display ="block"
+                document.getElementById("start").style.display ="none"
+                audio("cocaaudio")
+            }
+        }
+        function stop1(){
+            if(condition){
+                s_p2 = 0
+                stopcondition = true
+                clearInterval(timer_p2);
+                document.getElementById("stop").style.display ="none"
+                document.getElementById("start").style.display ="block"
+                audio("cocaaudio")
+            }
+        }
+        document.getElementById("1_minus").addEventListener("click",minus_1);
+        document.getElementById("2_minus").addEventListener("click",minus_2);
+        document.getElementById("1_plus").addEventListener("click",plus_1);
+        document.getElementById("2_plus").addEventListener("click",plus_2);
+        document.getElementById("checkbox1").addEventListener("click",setting_ab);
+        document.getElementById("touch1").addEventListener("click",touch1_touch);
+        document.getElementById("touch2").addEventListener("click",touch2_touch);
+        document.getElementById("refresh").addEventListener("click",refresh);
+        document.getElementById("stop").addEventListener("click",stop1);
+        document.getElementById("start").addEventListener("click",start1);
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('./sw.js').then(registration => {
+            console.log('ServiceWorker registration successful.');
+          }).catch(err => {
+            console.log('ServiceWorker registration failed.');
+          });
+        }
+      </script>
+</body>
+</html>
