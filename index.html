@@ -139,8 +139,8 @@
         }
         window.onload = function(){
             // ページ読み込み時に実行したい処理
-            if(!Cookies.get("save")==undefined){
-                
+            if (Cookies.get("save") === undefined){
+                console.log("undefined")
             }else{
                 if(Cookies.get("ab") == 0){
                     document.getElementById("checkbox1").checked = false
