@@ -178,13 +178,13 @@
             }
         }
         function save(){
-            Cookies.set("timer1",timer1);
-            Cookies.set("timer3",timer3);
-            Cookies.set("mode",mode);
-            Cookies.set("saudio",saudio);
-            Cookies.set("ab",ab);
-            Cookies.set("save","true");
-            Cookies.set("mute",mute);
+            Cookies.set("timer1",timer1, { expires: 365 });
+            Cookies.set("timer3",timer3, { expires: 365 });
+            Cookies.set("mode",mode, { expires: 365 });
+            Cookies.set("saudio",saudio, { expires: 365 });
+            Cookies.set("ab",ab, { expires: 365 });
+            Cookies.set("save","true", { expires: 365 });
+            Cookies.set("mute",mute, { expires: 365 });
             alert("保存しました")
         }
         function change_voice(){
