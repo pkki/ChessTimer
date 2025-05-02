@@ -107,6 +107,10 @@ const urlsToCache = [
     './voice/zunda/gover.mp3',
     './voice/zunda/sover.mp3',
     './voice/zunda/w.mp3',
+
+    './voice/sound/1.mp3',
+    './voice/sound/2.mp3',
+    './voice/sound/3.mp3',
   ];
 
   self.addEventListener('install', (event) => {

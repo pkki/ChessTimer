@@ -9,7 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/dist/js.cookie.min.js"></script>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="manifest" href="./manifest.json">
-    <meta name="description" content="読み上げ機能が付いている対局時計です。保存機能など付いており、これからも機能を追加していく予定です。是非使ってください！">
+    <meta name="description" content="読み上げ機能が付いている対局時計です。保存機能などが付いており、これからも機能を追加していく予定です。是非使ってください！">
 </head>
 
 <body>
@@ -36,6 +36,7 @@
                 <option value="voice/woman1/">女性1</option>
                 <option value="voice/men1_America/">America_men1</option>
                 <option value="voice/zunda/">ずんだもん</option>
+                <option value="voice/sound/">音だけ</option>
             </select>
         </div>
         <p> VOICEVOX:ずんだもん</p>
@@ -44,7 +45,7 @@
             <input type="checkbox" name="" id="mutec" onchange="mutee()">
         </div>
         <p>© 2025 pkki</p>
-        <p>バージョン1.0</p>
+        <p>バージョン1.01</p>
         <p>※保存にはcookieを使用します。</p>
         <button onclick="save()">保存</button>
         <button onclick="close_setting()">閉じる</button>
@@ -97,6 +98,7 @@
                     <p>先後で設定する</p>
                 </div>
                 <div>
+                    <button onclick="reverse_ab()">先後反転</button>
                     <button onclick="setting_detail()">詳細設定</button>
                 </div>
             </div>
@@ -138,6 +140,22 @@
                 mute = false
             }
         }
+        function reverse_ab() {
+            const touch1 = document.getElementById("touch");
+            const touch2 = document.getElementById("progress-bar");
+
+            // 現在の表示スタイル（computed style）を取得
+            const currentFlex = window.getComputedStyle(touch1).flexDirection;
+
+            if (currentFlex === "row-reverse") {
+                touch1.style.flexDirection = "";
+                touch2.style.flexDirection = "";
+            } else {
+                touch1.style.flexDirection = "row-reverse";
+                touch2.style.flexDirection = "row-reverse";
+            }
+        }
+
         window.onload = function(){
             // ページ読み込み時に実行したい処理
             if (Cookies.get("save") === undefined){
@@ -225,24 +243,31 @@
                 else if (a === 20) playAudio("20s");
                 else if (a === 10) playAudio("10s");
             } else {
-                if (a === 600) playAudio("10m");
-                else if (a === 300) playAudio("5m");
-                else if (a === 180) playAudio("3m");
-                else if (a === 60) playAudio("1m");
-                else if (a === 50) playAudio("50s");
-                else if (a === 40) playAudio("40s");
-                else if (a === 30) playAudio("30s");
-                else if (a === 20) playAudio("20s");
-                else if (a === 10) playAudio("10s");
-                else if (a === 9) playAudio("1s");
-                else if (a === 8) playAudio("2s");
-                else if (a === 7) playAudio("3s");
-                else if (a === 6) playAudio("4s");
-                else if (a === 5) playAudio("5s");
-                else if (a === 4) playAudio("6s");
-                else if (a === 3) playAudio("7s");
-                else if (a === 2) playAudio("8s");
-                else if (a === 1) playAudio("9s");
+                if(saudio == "voice/sound/"){
+                    if (a === 600 || a === 300 || a ===180 || a=== 60 || a=== 50|| a=== 40|| a=== 30|| a=== 20|| a=== 10) playAudio("2");
+                    else if(a <=9 && a >= 6) playAudio("1");
+                    else if(a <=5) playAudio("3");
+                }else{
+                    if (a === 600) playAudio("10m");
+                    else if (a === 300) playAudio("5m");
+                    else if (a === 180) playAudio("3m");
+                    else if (a === 60) playAudio("1m");
+                    else if (a === 50) playAudio("50s");
+                    else if (a === 40) playAudio("40s");
+                    else if (a === 30) playAudio("30s");
+                    else if (a === 20) playAudio("20s");
+                    else if (a === 10) playAudio("10s");
+                    else if (a === 9) playAudio("1s");
+                    else if (a === 8) playAudio("2s");
+                    else if (a === 7) playAudio("3s");
+                    else if (a === 6) playAudio("4s");
+                    else if (a === 5) playAudio("5s");
+                    else if (a === 4) playAudio("6s");
+                    else if (a === 3) playAudio("7s");
+                    else if (a === 2) playAudio("8s");
+                    else if (a === 1) playAudio("9s");
+                }
+                
             }
         }
     }
