@@ -10,6 +10,15 @@
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
     <link rel="manifest" href="./manifest.json">
     <meta name="description" content="読み上げ機能が付いている対局時計です。保存機能などが付いており、これからも機能を追加していく予定です。是非使ってください！">
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-8W389ZLG2V"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'G-8W389ZLG2V');
+    </script>
 </head>
 
 <body>
@@ -143,6 +152,7 @@
         function reverse_ab() {
             const touch1 = document.getElementById("touch");
             const touch2 = document.getElementById("progress-bar");
+            const timer_counter = document.getElementById("timer-d");
 
             // 現在の表示スタイル（computed style）を取得
             const currentFlex = window.getComputedStyle(touch1).flexDirection;
@@ -150,9 +160,11 @@
             if (currentFlex === "row-reverse") {
                 touch1.style.flexDirection = "";
                 touch2.style.flexDirection = "";
+                timer_counter.style.flexDirection = "";
             } else {
                 touch1.style.flexDirection = "row-reverse";
                 touch2.style.flexDirection = "row-reverse";
+                timer_counter.style.flexDirection = "row-reverse";
             }
         }
 
